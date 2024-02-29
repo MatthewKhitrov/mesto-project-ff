@@ -33,7 +33,7 @@ function deleteCard(event) {
   deleteItem.remove();
 }
 
-/* Функция добавления карточки */
+/* Функция добавления карточки  */
 initialCards.forEach((item) => {
   const elementadd = createСard(item.name, item.link, item.alt, deleteCard);
   placesList.append(elementadd);
