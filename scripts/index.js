@@ -14,7 +14,7 @@ const placesList = container.querySelector(".places__list");
 const cardTemplate = document.querySelector("#card-template").content;
 
 /* Функция создания карточки + обработчик клика */
-function createСard(name, link, alt, cardDel) {
+function creatCard(name, link, alt, cardDel) {
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
   const buttonDelete = cardElement.querySelector(".card__delete-button");
 
@@ -35,6 +35,6 @@ function deleteCard(event) {
 
 /* Функция добавления карточки  */
 initialCards.forEach((item) => {
-  const elementadd = createСard(item.name, item.link, item.alt, deleteCard);
-  placesList.append(elementadd);
+  const elementAdd = creatCard(item.name, item.link, item.alt, deleteCard);
+  placesList.append(elementAdd);
 });
