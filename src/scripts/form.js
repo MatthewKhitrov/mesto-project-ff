@@ -1,5 +1,5 @@
-import { nameInput, jobInput, formEdit, formENew, popupTipeEdit, placesList, popupNewCard } from "../index.js";
-import {creatCard, deleteCard, likeImage, openbigImg} from "./card.js";
+import { nameInput, jobInput, formEdit, formENew, popupTipeEdit, placesList, popupNewCard, openBigImg } from "../index.js";
+import {creatCard, deleteCard, likeImage} from "./card.js";
 import { closeModal } from "./modal.js";
 
 /* сохранение изменения в профиле */
@@ -21,7 +21,7 @@ export function saveFormNew (evt) {
             formENew.elements.place_name.value,
             deleteCard,
             likeImage,
-            openbigImg
+            openBigImg
         )
     );
     formENew.reset();

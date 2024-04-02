@@ -1,4 +1,3 @@
-import {popupTypeImage} from "../index.js"
 /* открытие модального окна */
 export function openModal (modal) {
     modal.classList.add("popup_is-opened");
@@ -29,10 +28,4 @@ function closeModalEsc(evt) {
     }
 }
 
-/* Открытие модального окна изображения */
-export function openModalImage (evt) {
-    if (evt.target.classList.contains("card__image")) {
-        openModal(popupTypeImage)
-    }
-}
 
