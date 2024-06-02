@@ -1,8 +1,27 @@
 import {initialCards} from './scripts/cards.js'
-import {openModal, closeModal, closeModalOverlay, openModalImage} from './scripts/modal.js'
-import {saveFormEdit, saveFormNew} from './scripts/form.js'
-import { creatCard, deleteCard, likeImage/* , openBigImg  */} from "./scripts/card.js";
+import {openModal, 
+  closeModal, 
+  closeModalOverlay, 
+  openModalImage} from './scripts/modal.js'
+import {saveFormEdit, 
+  saveFormNew, 
+  profilAvatarUpdate} from './scripts/form.js'
+import { creatCard, 
+  deleteCard, 
+  deleteCardDom, 
+  handleLikeIconClick/* , openBigImg  */} from "./scripts/card.js";
 import './pages/index.css'; /* для Webpack */
+
+import {userPromise, 
+  cardsPromise, 
+  deleteCardServ} from "./scripts/Api.js";
+
+import {showInputError,
+  hideInputError,
+  isValid,
+  setEventListeners,
+  clearErrorValid
+} from "./scripts/validation.js";
 
 /* Глобальные переменные */
 const container = document.querySelector(".content");
@@ -12,35 +31,51 @@ export const cardTemplate = document.querySelector("#card-template").content;
 export const popupTipeEdit = document.querySelector(".popup_type_edit");
 const buttonEdit = document.querySelector(".profile__edit-button");
 const buttonAdd = document.querySelector(".profile__add-button");
+const buttonAvatar = document.querySelector(".profile__image") /* для слушателя кнопки открытия попапа смены аватара */
+const popapAvatar = document.querySelector(".popup_profil_edit") /* div с формой смены аватара */
 const clickImage = document.querySelector(".card__image");
 export const popupTypeImage = document.querySelector(".popup_type_image");
 const popup = document.querySelectorAll(".popup");
 export const popupNewCard = document.querySelector(".popup_type_new-card");
+
 /* для форм */
 export const nameInput = document.querySelector(".profile__title");
 export const jobInput = document.querySelector(".profile__description");
 export const formEdit = document.querySelector(".popup__form_edit");
 export const formENew = document.querySelector(".popup__form_new");
+export const formProfil = document.querySelector(".popup_profil_edit")
+export const profileImage = document.querySelector(".profile__image")
+export const popapFormProfil = document.querySelector(".popup__form_profil")
 
 
-  /* Функция добавления карточки  */
-  initialCards.forEach((item) => {
-    const elementAdd = creatCard(item.name, item.link, item.alt, deleteCard, likeImage, openBigImg);
-    placesList.append(elementAdd);
-  });
+/* Для валидации */
+export const formElement = document.querySelector('.popup__form');
+export const formInput = formElement.querySelector('.popup__input_type_name');
+export const formElementNew = document.querySelector('.popup__form_new'); /* для дезактивации кнопки после добавления карточки */
 
 
 /* Слушатель для открытия модального окна по кнопке редактирования профиля + отображение текущего статуса */
+
 buttonEdit.addEventListener("click", function () {
+  clearErrorValid (formEdit) /* очищает валидацию при новом отктыие модального окна */
   formEdit.elements.name.value = nameInput.textContent; /* заполнение полей формы по умолчанию */
   formEdit.elements.description.value = jobInput.textContent; /* заполнение полей формы по умолчанию */
   openModal (popupTipeEdit)
 })
 
 /* Слушатель для открытия модального окна по кнопке добавление карточки */
+
 buttonAdd.addEventListener("click", function () {
+  clearErrorValid (formEdit) /* очищает валидацию при новом отктыие модального окна */
   openModal (popupNewCard)
 })
+
+/* Слушатель для открытие модального окна редактирования аватара 30.06.2024 */
+buttonAvatar.addEventListener("click", function () {
+  clearErrorValid (formProfil)
+   openModal (popapAvatar)
+})
+
 
 /* Функция (метод) для открытия модального окна по клику на изображение (открывается увеличеная картинка) */
 export function openBigImg(evt) {
@@ -52,9 +87,6 @@ export function openBigImg(evt) {
   popupImg.textContent = evt.target.alt;
 }
 
-
-
-
 /* Закрытие модальных оконо по OverLay || по крестику*/
 
 popup.forEach((evt) => {
@@ -62,8 +94,97 @@ popup.forEach((evt) => {
   evt.addEventListener("click", closeModalOverlay)
 })
 
-/* Слушатель для сохранения изм. модального окна редактирования профиля */
+/* КНОПКА СОХРАНИТЬ РЕДАКТИРОВАНИЯ ПРОФИЛЯ Слушатель для сохранения изм. модального окна редактирования профиля */
 formEdit.addEventListener("submit", saveFormEdit);
-/* Слушатель для изм. и добавления карточки */
+/* КНОПКА СОХРАНИТЬ ДОБАВЛЕНИЯ КАРТОЧКИ Слушатель для изм. и добавления карточки */
 formENew.addEventListener("submit", saveFormNew);
+/* КНОПКА СОХРАНИТЬ попап изменения аватара */
+popapFormProfil.addEventListener("submit", profilAvatarUpdate)
 
+/* ----------------------ВАЛИДАЦИЯ---------------------- */
+// Добавление обработчика ко всем формам
+
+const enableValidation = () => {
+  // Найдём все формы с указанным классом в DOM, сделаем из них массив методом Array.from
+  const formList = Array.from(document.querySelectorAll('.popup__form'));
+
+  // Переберём полученную коллекцию
+  formList.forEach((formElement) => {
+    // Для каждой формы вызовем функцию setEventListeners, передав ей элемент формы
+    setEventListeners(formElement);
+  });
+};
+
+enableValidation(); 
+
+  /* API */
+
+  /* Подключение к серверу */
+/* Выполнение обещаний после прогрузки необходимой информации с APi. Загрузка на страницу информацию обо мне и погрузка карточек с сервера */
+Promise.all([userPromise(), cardsPromise()])
+.then(([userData, cardData]) => {
+  /* Отображение моего имени и моей работы */
+  nameInput.textContent = userData.name;
+  jobInput.textContent = userData.about;
+  profileImage.setAttribute(
+    "style",
+    `background-image: url('${userData.avatar}')`
+  );
+
+  /* Выгрузка всех карточек с сервера */
+  cardData.forEach((item) => {
+    const cardIsMy = userData._id !== item.owner._id;
+    console.log(cardIsMy)
+    const cardMeLike = userData._id === likeMeCard(item.likes, userData._id);
+    const elementAdd = creatCard(
+      item.name,
+      item.link,
+      item.alt,
+      () => {
+      deleteCardServ(item._id).then(()=>{
+        console.log()
+        deleteCardDom(elementAdd)
+      }) 
+     },
+     handleLikeIconClick, 
+      openBigImg,
+      item.likes,
+      cardIsMy,
+      item._id,
+      cardMeLike
+    );
+    placesList.append(elementAdd);
+  });
+})
+/* В случае ошибки выводится окно об ошибке */
+.catch((err) => {
+  console.log("Error fetching user and cards data: ", err);
+});
+
+
+/* Функция для подгрузки лайкнутых мною карточек */
+export function likeMeCard(items, userId) {
+  let cardMeLike;
+  items.some((likeId) => {
+    if (likeId._id === userId) {
+      return (cardMeLike = userId);
+    } else {
+      cardMeLike = likeId._id;
+    }
+  });
+  return cardMeLike;
+}
+
+
+/* Функция для "лоадера" */
+export function editingTextButton (popupLoad, isLoad) {
+  let textLoad = popupLoad.querySelector(".popup__button");
+  console.log("1")
+  if (isLoad) {
+    textLoad.textContent = "Сохранение...";
+    console.log("2")
+  } else {
+    textLoad.textContent = "Сохранить";
+    console.log("3")
+  }
+}
