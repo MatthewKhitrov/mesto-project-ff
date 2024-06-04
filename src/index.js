@@ -2,26 +2,37 @@ import {initialCards} from './scripts/cards.js'
 import {openModal, 
   closeModal, 
   closeModalOverlay, 
-  openModalImage} from './scripts/modal.js'
+  /* openModalImage */} from './scripts/modal.js'
 import {saveFormEdit, 
   saveFormNew, 
   profilAvatarUpdate} from './scripts/form.js'
-import { creatCard, 
+import { createCard, 
   deleteCard, 
   deleteCardDom, 
   handleLikeIconClick/* , openBigImg  */} from "./scripts/card.js";
-import './pages/index.css'; /* для Webpack */
+/* import './pages/index.css'; */ /* для Webpack */
 
 import {userPromise, 
   cardsPromise, 
   deleteCardServ} from "./scripts/Api.js";
 
-import {showInputError,
+import {/* showInputError,
   hideInputError,
-  isValid,
+  isValid, */
   setEventListeners,
-  clearErrorValid
-} from "./scripts/validation.js";
+  clearErrorValid,
+ } from "./scripts/validation.js";
+
+export const validationConfig = { 
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_inactive",
+  inputErrorClass: "form__input_type_error",
+  errorClass: "form__input-error_active",
+  inputErrormessage: ".form__input-error",
+  classError: "form__input_type_error"
+};
+
 
 /* Глобальные переменные */
 const container = document.querySelector(".content");
@@ -57,7 +68,7 @@ export const formElementNew = document.querySelector('.popup__form_new'); /* д�
 /* Слушатель для открытия модального окна по кнопке редактирования профиля + отображение текущего статуса */
 
 buttonEdit.addEventListener("click", function () {
-  clearErrorValid (formEdit) /* очищает валидацию при новом отктыие модального окна */
+  clearErrorValid (formEdit, validationConfig) /* очищает валидацию при новом отктыие модального окна */
   formEdit.elements.name.value = nameInput.textContent; /* заполнение полей формы по умолчанию */
   formEdit.elements.description.value = jobInput.textContent; /* заполнение полей формы по умолчанию */
   openModal (popupTipeEdit)
@@ -66,13 +77,13 @@ buttonEdit.addEventListener("click", function () {
 /* Слушатель для открытия модального окна по кнопке добавление карточки */
 
 buttonAdd.addEventListener("click", function () {
-  clearErrorValid (formEdit) /* очищает валидацию при новом отктыие модального окна */
+  clearErrorValid (formEdit, validationConfig) /* очищает валидацию при новом отктыие модального окна */
   openModal (popupNewCard)
 })
 
 /* Слушатель для открытие модального окна редактирования аватара 30.06.2024 */
 buttonAvatar.addEventListener("click", function () {
-  clearErrorValid (formProfil)
+  clearErrorValid (formProfil, validationConfig)
    openModal (popapAvatar)
 })
 
@@ -104,18 +115,18 @@ popapFormProfil.addEventListener("submit", profilAvatarUpdate)
 /* ----------------------ВАЛИДАЦИЯ---------------------- */
 // Добавление обработчика ко всем формам
 
-const enableValidation = () => {
+const enableValidation = (validationConfig) => {
   // Найдём все формы с указанным классом в DOM, сделаем из них массив методом Array.from
   const formList = Array.from(document.querySelectorAll('.popup__form'));
 
   // Переберём полученную коллекцию
   formList.forEach((formElement) => {
     // Для каждой формы вызовем функцию setEventListeners, передав ей элемент формы
-    setEventListeners(formElement);
+    setEventListeners(formElement, validationConfig);
   });
 };
 
-enableValidation(); 
+enableValidation(validationConfig); 
 
   /* API */
 
@@ -136,7 +147,7 @@ Promise.all([userPromise(), cardsPromise()])
     const cardIsMy = userData._id !== item.owner._id;
     console.log(cardIsMy)
     const cardMeLike = userData._id === likeMeCard(item.likes, userData._id);
-    const elementAdd = creatCard(
+    const elementAdd = createCard(
       item.name,
       item.link,
       item.alt,

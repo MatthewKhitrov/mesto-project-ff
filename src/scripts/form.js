@@ -12,7 +12,7 @@ import { nameInput,
     popapFormProfil,
     editingTextButton
 } from "../index.js";
-import {creatCard, 
+import {createCard, 
     deleteCard, 
     handleLikeIconClick} from "./card.js";
 import { closeModal } from "./modal.js";
@@ -38,7 +38,7 @@ export function saveFormNew (evt) {
     evt.preventDefault();
     editingTextButton(popupNewCard, true);
     placesList.prepend(
-        creatCard(
+        createCard(
             formENew.elements.place_name.value,
             formENew.elements.link.value,
             formENew.elements.place_name.value,

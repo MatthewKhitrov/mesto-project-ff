@@ -2,7 +2,7 @@ import {sendLike,
   deleteLike} from "./Api.js"
 
 /* Функция создания карточки + обработчик клика */
-export function creatCard(name, link, alt, deleteCard, likeCard, 
+export function createCard(name, link, alt, deleteCard, likeCard, 
   openImg, like, cardIsMy, cardID, likeMe) {
     const cardTemplate = document.querySelector("#card-template").content;
     const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
@@ -15,7 +15,7 @@ export function creatCard(name, link, alt, deleteCard, likeCard,
 
     cardElement.querySelector(".card__image").src = link;
     cardElement.querySelector(".card__title").textContent = name;
-    cardElement.querySelector(".card__image").alt = alt;
+    cardElement.querySelector(".card__image").alt = name;
      /* слушатели */
      if (cardIsMy) {
       buttonDelete.remove()}
