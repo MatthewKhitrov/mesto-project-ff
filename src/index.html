@@ -8,26 +8,26 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Mesto</title>
-     <link rel="stylesheet" href="./pages/index.css">
+    <!-- <link rel="stylesheet" href="./pages/index.css"> -->
     <!-- стили подключает Webpack -->
   </head>
   <body class="page">
     <div class="page__content">
       <header class="header page__section">
-         <img src='./images/logo.svg' alt="Логотип проекта масто" class="logo header__logo">
-        <!-- <img
+        <!--  <img src='./images/logo.svg' alt="Логотип проекта масто" class="logo header__logo"> -->
+        <img
           src="<%=require('./images/logo.svg')%>"
           alt="Логотип проекта масто"
           class="logo header__logo"
-        /> -->
+        />
       </header>
       <main class="content">
         <section class="profile page__section">
-          <div class="profile__image" style="background-image: url('./images/avatar.jpg')"></div>
-         <!--  <div
+          <!-- <div class="profile__image" style="background-image: url('./images/avatar.jpg')"></div> -->
+          <div
             class="profile__image"
             style="background-image: url('<%=require('./images/avatar.jpg')%>')"
-          ></div> -->
+          ></div>
 
           <!-- модальное окно для редактирования аватара -->
           <div class="popup popup_profil_edit">
@@ -48,8 +48,7 @@
                   required
                 />
                 <span
-                  class="popup__input-error 
-                  popup__input_type_url-error form__input-error" 
+                  class="popup__input-error popup__input_type_url-error form__input-error"
                 ></span>
                 <button type="submit" class="button popup__button">
                   Сохранить
@@ -172,7 +171,7 @@
     </div>
     <!-- <script src="./scripts/cards.js"></script> -->
     <!-- скрипт импортирован в index.js -->
-    <script src="./index.js" defer type="module"></script>
+    <!-- <script src="./index.js" defer type="module"></script> -->
     <!-- скрипт подключает Webpack -->
 
     <template id="card-template">
@@ -182,9 +181,9 @@
         <div class="card__description">
           <h2 class="card__title"></h2>
           <div class="like_box">
-          <button type="button" class="card__like-button"></button>
-          <span class="counter_like"></span>
-        </div>
+            <button type="button" class="card__like-button"></button>
+            <span class="counter_like"></span>
+          </div>
         </div>
       </li>
     </template>
